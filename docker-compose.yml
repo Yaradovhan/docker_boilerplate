@@ -1,20 +1,22 @@
-name: crypto_currency
+name: boilerplate-test
 
 services:
   app:
     build: images/application
-    container_name: symfony_app
+    container_name: boilerplate_app
     depends_on:
       - mongo
+      - mysql
     init: true
     volumes:
       - ./application:/var/www/html
       - ./images/application/usr/local/etc/php/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
+      - ./images/application/usr/local/etc/php/conf.d/opcache.ini:/usr/local/etc/php/conf.d/opcache.ini
       - ./images/application/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
       - ./data/share:/usr/share/data
     working_dir: /var/www/html
     networks:
-      - symfony_network
+      - boilerplate_network
     environment:
       - PHP_IDE_CONFIG=serverName=localhost
     extra_hosts:
@@ -22,7 +24,7 @@ services:
 
   nginx:
     image: nginx:latest
-    container_name: symfony_nginx
+    container_name: boilerplate_nginx
     ports:
       - "80:80"
     volumes:
@@ -31,11 +33,11 @@ services:
     depends_on:
       - app
     networks:
-      - symfony_network
+      - boilerplate_network
 
   mongo:
     image: mongo:4.4
-    container_name: symfony_mongo
+    container_name: boilerplate_mongo
     ports:
       - "${MONGO_SERVER_PORT}:27017"
     environment:
@@ -44,7 +46,34 @@ services:
       - ./data/mongo:/data/db:delegated
       - ./data/share:/usr/share/data
     networks:
-      - symfony_network
+      - boilerplate_network
+
+  mysql:
+    image: mysql:8.1
+    container_name: boilerplate_mysql
+    ports:
+      - 3306:3306
+    volumes:
+      - ./data/db/data:/var/lib/mysql
+      - ./data/logs:/var/log/mysql
+      - ./data/db/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./data/db/sql:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: boilerplate
+      MYSQL_USER: boilerplate
+      MYSQL_PASSWORD: boilerplate
+    networks:
+      - boilerplate_network
+
+  mail:
+    image: axllent/mailpit:latest
+    container_name: boilerplate_mail
+    ports:
+      - 8025:8025
+      - 1025:1025
+    networks:
+      - boilerplate_network
 
 networks:
-  symfony_network:
+  boilerplate_network:

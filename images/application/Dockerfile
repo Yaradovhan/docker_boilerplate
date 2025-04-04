@@ -7,10 +7,16 @@ RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
     libonig-dev \
     unzip \
-    && docker-php-ext-install pdo pdo_mysql intl gd bcmath
+    curl \
+    gnupg \
+    ca-certificates \
+    && docker-php-ext-install pdo pdo_mysql intl gd bcmath opcache
 
 RUN pecl install mongodb && docker-php-ext-enable mongodb
 RUN pecl install xdebug && docker-php-ext-enable xdebug
+
+RUN curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | bash && \
+    apt-get install -y symfony-cli
 
 ENV XDEBUGINI_PATH=/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 

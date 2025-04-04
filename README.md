@@ -32,18 +32,6 @@
 6. Init Symfony project:
    ```bash
    docker compose exec app composer install
-   ```  
+   ```
 
-7. Prepare MongoDB schema and update data:
-   ```bash
-   docker compose exec app php bin/console doctrine:mongodb:schema:update
-   docker compose exec app php bin/console app:update-currency-rate
-   docker compose exec app php bin/console crypto:update-prices
-   ```  
-
-8. Run Messenger queue worker in the background:
-   ```bash
-   docker compose exec -d app php bin/console messenger:consume -v scheduler_default
-   ```  
-
-9. Open `http://localhost` in your browser to verify the project is installed correctly.
+7. Open `http://localhost` in your browser to verify the project is installed correctly.
